@@ -1,0 +1,52 @@
+# Compilados Java
+*.class
+
+# Diretórios de build
+/target/
+/bin/
+/out/
+
+# Arquivos de log
+*.log
+
+# Arquivos de configuração do Maven
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+
+# Arquivos do Maven Wrapper
+mvnw
+mvnw.cmd
+
+# Arquivos de configuração do Eclipse
+*.classpath
+*.project
+*.settings/
+
+# Arquivos do IntelliJ IDEA
+*.iml
+.idea/
+*.iws
+*.ipr
+out/
+
+# Arquivos do VS Code
+.vscode/
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de ambiente
+.env
+
+# Arquivos de teste
+/surefire-reports/
+/jacoco.exec
+
+# Arquivos temporários
+*.tmp
+*.swp
+*.swo
+
+# Arquivos de backup
+*~
