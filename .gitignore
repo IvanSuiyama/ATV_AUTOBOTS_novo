@@ -39,6 +39,9 @@ Thumbs.db
 # Arquivos de ambiente
 .env
 
+# Ignorar a pasta atv2 apenas nesta branch
+atv2/
+
 # Arquivos de teste
 /surefire-reports/
 /jacoco.exec
