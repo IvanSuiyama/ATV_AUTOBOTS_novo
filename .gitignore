@@ -50,3 +50,7 @@ Thumbs.db
 
 # Arquivos de backup
 *~
+
+# Ignorar as pastas atv1 e atv2 apenas nesta branch
+atv1/
+atv2/
