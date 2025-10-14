@@ -28,4 +28,8 @@ public class Endereco {
 	private String codigoPostal;
 	@Column()
 	private String informacoesAdicionais;
+
+	public String getCep() {
+		return this.codigoPostal;
+	}
 }
