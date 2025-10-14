@@ -39,4 +39,13 @@ public class Venda {
 	private Set<Servico> servicos = new HashSet<>();
 	@OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
 	private Veiculo veiculo;
+
+	// Adicionando métodos para descrição
+	public String getDescricao() {
+		return identificacao;
+	}
+
+	public void setDescricao(String descricao) {
+		this.identificacao = descricao;
+	}
 }
