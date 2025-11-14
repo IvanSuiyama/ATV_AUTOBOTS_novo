@@ -32,56 +32,6 @@ curl -X POST http://localhost:8080/login \
 
 ## 👥 2. USUÁRIOS
 
-### Cadastrar Usuário (PÚBLICO - sem token)
-```bash
-# Admin
-curl -X POST http://localhost:8080/usuarios/cadastrar \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "Carlos Admin",
-    "credencial": {
-      "nomeUsuario": "carlos",
-      "senha": "123456"
-    },
-    "perfis": ["ROLE_ADMIN"]
-  }'
-
-# Gerente
-curl -X POST http://localhost:8080/usuarios/cadastrar \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "Maria Gerente",
-    "credencial": {
-      "nomeUsuario": "maria",
-      "senha": "123456"
-    },
-    "perfis": ["ROLE_GERENTE"]
-  }'
-
-# Vendedor
-curl -X POST http://localhost:8080/usuarios/cadastrar \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "João Vendedor",
-    "credencial": {
-      "nomeUsuario": "joao",
-      "senha": "123456"
-    },
-    "perfis": ["ROLE_VENDEDOR"]
-  }'
-
-# Cliente
-curl -X POST http://localhost:8080/usuarios/cadastrar \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "Pedro Cliente",
-    "credencial": {
-      "nomeUsuario": "pedro",
-      "senha": "123456"
-    },
-    "perfis": ["ROLE_CLIENTE"]
-  }'
-```
 
 ### Listar Usuários (ADMIN apenas)
 ```bash
@@ -347,49 +297,6 @@ curl -X GET http://localhost:8080/servicos
 curl -X GET http://localhost:8080/usuarios \
   -H "Authorization: Bearer token-invalido"
 ```
-
----
-
-## 📊 8. MATRIZ DE PERMISSÕES
-
-| Endpoint | ADMIN | GERENTE | VENDEDOR | CLIENTE |
-|----------|-------|---------|----------|---------|
-| **Usuários** |
-| GET /usuarios | ✅ | ❌ | ❌ | ❌ |
-| POST /usuarios/cadastrar | ✅ (público) | ✅ (público) | ✅ (público) | ✅ (público) |
-| **Clientes** |
-| GET /clientes | ✅ | ✅ | ✅ | ❌ |
-| POST /clientes | ✅ | ✅ | ✅ | ❌ |
-| PUT /clientes/{id} | ✅ | ✅ | ❌ | ❌ |
-| DELETE /clientes/{id} | ✅ | ❌ | ❌ | ❌ |
-| **Serviços** |
-| GET /servicos | ✅ | ✅ | ✅ | ✅ |
-| POST /servicos | ✅ | ✅ | ❌ | ❌ |
-| PUT /servicos/{id} | ✅ | ✅ | ❌ | ❌ |
-| DELETE /servicos/{id} | ✅ | ❌ | ❌ | ❌ |
-| **Mercadorias** |
-| GET /mercadorias | ✅ | ✅ | ✅ | ✅ |
-| POST /mercadorias | ✅ | ✅ | ❌ | ❌ |
-| PUT /mercadorias/{id} | ✅ | ✅ | ❌ | ❌ |
-| DELETE /mercadorias/{id} | ✅ | ❌ | ❌ | ❌ |
-| **Vendas** |
-| GET /vendas | ✅ | ✅ | ✅ | ✅ |
-| POST /vendas | ✅ | ✅ | ✅ | ✅ |
-| PUT /vendas/{id} | ✅ | ✅ | ❌ | ❌ |
-| DELETE /vendas/{id} | ✅ | ❌ | ❌ | ❌ |
-
----
-
-## 🔧 9. ACESSO AO BANCO H2
-
-Para visualizar os dados no banco:
-
-1. Acesse: http://localhost:8080/h2-console
-2. **JDBC URL:** `jdbc:h2:mem:testdb`
-3. **Username:** `sa`
-4. **Password:** `password`
-
----
 
 ## 📝 NOTAS
 
