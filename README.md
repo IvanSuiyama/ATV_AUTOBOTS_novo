@@ -2,6 +2,9 @@
 
 Sistema completo de gerenciamento automotivo usando Spring Boot com JPA, H2, HATEOAS e funcionalidades avançadas como usuários, veículos, serviços, mercadorias e vendas.
 
+## 📖 Visão Geral do Sistema
+O Automanager é um sistema completo de gestão automotiva desenvolvido em Java com Spring Boot. O sistema oferece tanto uma interface de terminal interativa quanto uma API REST completa com HATEOAS para gerenciar clientes, funcionários, fornecedores, serviços, vendas e veículos de forma integrada e profissional.
+
 ## 📋 Pré-requisitos
 
 ### ☕ Java
@@ -18,7 +21,50 @@ java -version
 mvn -version
 ```
 
-## 🛠️ Dependências do Projeto
+## � Funcionalidades Principais
+
+### 🔐 Sistema de Autenticação
+- Login de funcionário com credenciais
+- Primeiro acesso: criação automática de conta funcionário
+- Controle de sessão e segurança
+
+### 👥 Gestão de Clientes
+- **CRUD Completo**: Cadastro, consulta, edição e exclusão
+- **Dados Pessoais**: Nome, nome social, email (obrigatório)
+- **Documentos**: CPF, CNPJ, RG, CNH, Passaporte com validação de tipos
+- **Contato**: Telefones com DDD obrigatório
+- **Endereço**: Completo com todos os campos obrigatórios
+- **Veículos**: Gestão de automóveis do cliente
+
+### 🚗 Gestão de Veículos
+- **Informações Completas**: Tipo, marca, modelo, cor, placa
+- **Tipos Suportados**: HATCH, SEDA, SUV, PICKUP, SW
+- **Cadastro por Cliente**: Vinculação automática ao proprietário
+- **Edição Completa**: Todos os campos editáveis
+
+### 🔧 Gestão de Serviços
+- **CRUD de Serviços**: Nome, valor, descrição
+- **Busca e Consulta**: Por nome do serviço
+- **Precificação**: Valor configurável por serviço
+
+### 💰 Sistema de Vendas Inteligente
+- **Tipos de Venda**: Serviços ou Automóveis
+- **Seleção Dinâmica**: Lista numerada de itens disponíveis
+- **Informações Detalhadas**: 
+  - Serviços: Nome e valor
+  - Automóveis: Marca, modelo, cor e placa
+- **Valor Personalizável**: Preço específico por venda
+- **Vinculação de Cliente**: Busca por email
+- **Histórico**: Consulta completa de vendas com cliente e valor
+
+### 👔 Gestão de Funcionários
+- **CRUD Básico**: Nome e nome social
+- **Perfis**: Sistema de perfis de usuário
+
+### 🏢 Gestão de Fornecedores
+- **Sistema Integrado**: Cadastro e gerenciamento
+
+## �🛠️ Dependências do Projeto
 
 ### Framework Principal
 - **Spring Boot 2.6.7**
@@ -28,6 +74,7 @@ mvn -version
 
 ### Banco de Dados
 - **H2 Database** (in-memory para desenvolvimento)
+- **MySQL** (configurável para produção)
 - **Hibernate** (JPA provider)
 
 ### Utilitários
@@ -59,6 +106,33 @@ mvn spring-boot:run
 
 ### 4. Verificar se Subiu
 A aplicação estará disponível em: **http://localhost:8080**
+
+### 5. Primeiro Acesso
+1. Na primeira execução, escolha "1 - Criar conta de Funcionário" no terminal
+2. Cadastre suas credenciais (usuário e senha)
+3. O sistema fará login automático e exibirá o menu principal
+
+## 🎯 Destaques Técnicos
+
+### ✅ Validações Robustas
+- **Campos Obrigatórios**: Todos os campos nullable=false validados
+- **Tipos de Documento**: Validação por enum
+- **Tipos de Veículo**: Validação por enum
+- **Email Obrigatório**: Validação em tempo real
+- **Data de Emissão**: Automática para documentos
+
+### 🔄 Relacionamentos Complexos
+```
+Usuario ↔ Documentos, Telefones, Endereços, Veículos, Emails
+Venda ↔ Cliente, Funcionário, Serviços, Veículo, Valor
+Veiculo ↔ Proprietário, Vendas
+```
+
+### 🎮 Interface de Terminal Profissional
+- **Menu Hierárquico**: Navegação intuitiva entre módulos
+- **Sub-menus Organizados**: Cada entidade com seu menu específico
+- **Feedback ao Usuário**: Mensagens de sucesso/erro claras
+- **Validação em Tempo Real**: Tratamento de dados inválidos
 
 ## 🏢 Sistema Completo - Funcionalidades
 
@@ -202,13 +276,21 @@ curl -X POST http://localhost:8080/vendas \
   }'
 ```
 
-## 🗄️ Banco de Dados H2
+## ⚙️ Configurações
 
-### Console Web
+### Banco de Dados
+- **Padrão**: MySQL (configurado em `application.properties`)
+- **Alternativo**: H2 em memória (para desenvolvimento)
+
+### Console Web H2 (Desenvolvimento)
 - **URL:** http://localhost:8080/h2-console
 - **JDBC URL:** `jdbc:h2:mem:testdb`
 - **Username:** `sa`
 - **Password:** `password`
+
+### Seed Data
+- Funcionário padrão: usuário "ivan", senha "1234"
+- Empresa exemplo já cadastrada
 
 ### Tabelas Principais
 - `USUARIO` - Dados dos usuários
@@ -223,16 +305,77 @@ curl -X POST http://localhost:8080/vendas \
 - `DOCUMENTO` - Documentos (CPF, RG, etc.)
 - `EMAIL` - Emails de contato
 
+## 🎮 Como Usar o Sistema
+
+### Menu Principal
+```
+--- Menu Principal ---
+1 - Menu de Clientes
+2 - Menu de Funcionários  
+3 - Menu de Fornecedores
+4 - Menu de Serviços
+0 - Sair
+```
+
+### Exemplo: Cadastrar Cliente Completo
+1. Escolha "1 - Menu de Clientes"
+2. Escolha "1 - Cadastrar cliente"
+3. Preencha:
+   - Nome: "João Silva"
+   - Nome social: (opcional)
+   - Documento: S → CPF → "12345678901"
+   - Telefone: S → DDD: "11" → Número: "999887766"
+   - Endereço: S → (todos os campos)
+   - Automóvel: S → HATCH → Toyota → Corolla → Branco → ABC1234
+   - Email: "joao@email.com" ✅ (obrigatório)
+
+### Exemplo: Registrar Venda
+1. Menu Serviços → "3 - Registrar venda"
+2. Tipo: "1 - Serviço" ou "2 - Automóvel"
+3. Escolher da lista numerada
+4. Informar valor: "R$ 150,00"
+5. Email do cliente: "joao@email.com"
+6. ✅ Venda registrada!
+
 ## 📁 Estrutura do Projeto
 
 ```
 src/main/java/com/autobots/automanager/
 ├── controller/          # REST Controllers
-├── entitades/          # JPA Entities
+│   ├── CredencialController.java
+│   ├── DocumentoController.java
+│   ├── EmailController.java
+│   ├── EnderecoController.java
+│   ├── MercadoriaController.java
+│   ├── ServicoController.java
+│   ├── TelefoneController.java
+│   ├── UsuarioController.java
+│   ├── VeiculoController.java
+│   └── VendaController.java
+├── entitades/          # JPA Entities (Modelos de dados)
+│   ├── Usuario.java    # Funcionários e Clientes
+│   ├── Veiculo.java    # Automóveis com marca, modelo, cor
+│   ├── Venda.java      # Vendas com valor e relacionamentos  
+│   ├── Servico.java    # Serviços oferecidos
+│   ├── Mercadoria.java # Produtos e peças
+│   ├── Documento.java  # CPF, RG, CNH, etc.
+│   ├── Telefone.java   # Telefones com DDD
+│   ├── Endereco.java   # Endereços completos
+│   ├── Email.java      # Emails dos usuários
+│   ├── Credencial.java # Sistema de autenticação
+│   └── Empresa.java    # Dados da empresa
 ├── enumeracoes/        # Enums (PerfilUsuario, TipoDocumento, etc.)
-├── menus/             # Classes de menu (Terminal UI)
-├── modelo/            # Business Logic Classes
-└── repositorio/       # JPA Repositories
+│   ├── PerfilUsuario.java
+│   ├── TipoDocumento.java
+│   └── TipoVeiculo.java
+├── menus/             # Interface de terminal
+│   ├── MenuTerminal.java    # Menu principal e autenticação
+│   ├── MenuCliente.java     # CRUD completo de clientes
+│   ├── MenuFuncionario.java # Gestão de funcionários
+│   ├── MenuFornecedor.java  # Gestão de fornecedores
+│   └── MenuServico.java     # Serviços e sistema de vendas
+├── repositorios/       # Repositories (Spring Data JPA)
+└── AutomanagerApplication.java # Ponto de entrada + seed data
 
 src/main/resources/
 └── application.properties # Application configuration
@@ -261,6 +404,24 @@ Todas as entidades possuem links autodescritivos:
 
 ## 🎯 Funcionalidades Avançadas
 
+### Relacionamentos Automáticos
+- Cliente → Múltiplos documentos, telefones, veículos
+- Venda → Cliente + (Serviço OU Veículo) + Valor
+- Histórico completo de vendas por cliente
+
+### Validações Inteligentes
+- Email obrigatório em clientes
+- DDD obrigatório em telefones  
+- Data de emissão automática em documentos
+- Tipos de enum validados (documento/veículo)
+
+### Sistema de Busca
+- Clientes por email
+- Serviços por nome
+- Funcionários por nome
+- Veículos por placa
+
+### Recursos do Sistema
 - ✅ Sistema completo de usuários com perfis
 - ✅ Gerenciamento de veículos por cliente
 - ✅ Catálogo de serviços automotivos
@@ -269,6 +430,14 @@ Todas as entidades possuem links autodescritivos:
 - ✅ HATEOAS em todos os endpoints
 - ✅ Relacionamentos complexos entre entidades
 - ✅ Interface de terminal (menus)
+- ✅ Sistema de autenticação robusto
+- ✅ Validações completas de dados
+
+## 📊 Relatórios Disponíveis
+- Lista completa de clientes com todos os dados
+- Histórico de vendas com cliente e valor
+- Consulta de automóveis por cliente
+- Inventário de serviços disponíveis
 
 ## 🐛 Solução de Problemas
 
@@ -289,14 +458,25 @@ chmod +x mvnw
 
 ## 📚 Tecnologias Utilizadas
 
-- Spring Boot 2.6.7
-- Spring Data JPA
-- Spring HATEOAS
-- H2 Database
-- Hibernate
-- Lombok
-- Maven
+- **Java 17**
+- **Spring Boot 2.6.7**
+- **Spring Data JPA**
+- **Spring HATEOAS**
+- **H2 Database** (desenvolvimento)
+- **MySQL** (configurável para produção)
+- **Hibernate** (JPA provider)
+- **Lombok** (redução de boilerplate)
+- **Maven** (gerenciamento de dependências)
+
+## 📝 Observações Técnicas
+- Todos os campos obrigatórios (`nullable = false`) devidamente validados
+- Cascade configurado para operações em entidades relacionadas
+- FetchType.EAGER para carregamento completo dos dados
+- Tratamento robusto de exceções e validações
+- Sistema HATEOAS implementado em todos os endpoints
+- Interface de terminal interativa para demonstração
 
 ---
 
-🏢 **Sistema Automotivo Completo** - Solução integrada para gestão de oficina automotiva com HATEOAS.
+🏢 **Sistema Automotivo Completo** - Solução integrada para gestão de oficina automotiva com HATEOAS e interface de terminal.  
+*Um sistema completo que vai muito além das expectativas! 🚀*

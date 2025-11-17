@@ -7,6 +7,7 @@ import com.autobots.automanager.entitades.Telefone;
 import com.autobots.automanager.entitades.Endereco;
 import com.autobots.automanager.repositorios.RepositorioUsuario;
 import com.autobots.automanager.enumeracoes.TipoDocumento;
+import com.autobots.automanager.enumeracoes.TipoVeiculo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -94,12 +95,15 @@ public class MenuCliente {
             }
             System.out.print("Número do documento: ");
             documento.setNumero(scanner.nextLine());
+            documento.setDataEmissao(new java.util.Date()); // Define a data de emissão atual
             usuario.getDocumentos().add(documento);
         }
 
         System.out.print("Deseja cadastrar um telefone? (S/N): ");
         if (scanner.nextLine().equalsIgnoreCase("S")) {
             Telefone telefone = new Telefone();
+            System.out.print("DDD: ");
+            telefone.setDdd(scanner.nextLine());
             System.out.print("Número do telefone: ");
             telefone.setNumero(scanner.nextLine());
             usuario.getTelefones().add(telefone);
@@ -126,8 +130,19 @@ public class MenuCliente {
         System.out.print("Deseja cadastrar um automóvel? (S/N): ");
         if (scanner.nextLine().equalsIgnoreCase("S")) {
             Veiculo veiculo = new Veiculo();
+            System.out.print("Tipo de veículo (HATCH, SEDA, SUV, PICKUP, SW): ");
+            try {
+                veiculo.setTipo(TipoVeiculo.valueOf(scanner.nextLine().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                System.out.println("Tipo de veículo inválido. Cadastro cancelado.");
+                return;
+            }
+            System.out.print("Marca do automóvel: ");
+            veiculo.setMarca(scanner.nextLine());
             System.out.print("Modelo do automóvel: ");
             veiculo.setModelo(scanner.nextLine());
+            System.out.print("Cor do automóvel: ");
+            veiculo.setCor(scanner.nextLine());
             System.out.print("Placa do automóvel: ");
             veiculo.setPlaca(scanner.nextLine());
             usuario.getVeiculos().add(veiculo);
@@ -176,7 +191,7 @@ public class MenuCliente {
             System.out.println("Documentos: ");
             usuario.getDocumentos().forEach(d -> System.out.println("Tipo: " + d.getTipo() + ", Número: " + d.getNumero()));
             System.out.println("Automóveis: ");
-            usuario.getVeiculos().forEach(v -> System.out.println("Modelo: " + v.getModelo() + ", Placa: " + v.getPlaca()));
+            usuario.getVeiculos().forEach(v -> System.out.println("Marca: " + v.getMarca() + ", Modelo: " + v.getModelo() + ", Cor: " + v.getCor() + ", Placa: " + v.getPlaca()));
         } else {
             System.out.println("Cliente não encontrado.");
         }
@@ -192,8 +207,19 @@ public class MenuCliente {
         if (cliente.isPresent()) {
             Usuario usuario = cliente.get();
             Veiculo veiculo = new Veiculo();
+            System.out.print("Tipo de veículo (HATCH, SEDA, SUV, PICKUP, SW): ");
+            try {
+                veiculo.setTipo(TipoVeiculo.valueOf(scanner.nextLine().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                System.out.println("Tipo de veículo inválido. Cadastro cancelado.");
+                return;
+            }
+            System.out.print("Marca do automóvel: ");
+            veiculo.setMarca(scanner.nextLine());
             System.out.print("Modelo do automóvel: ");
             veiculo.setModelo(scanner.nextLine());
+            System.out.print("Cor do automóvel: ");
+            veiculo.setCor(scanner.nextLine());
             System.out.print("Placa do automóvel: ");
             veiculo.setPlaca(scanner.nextLine());
             usuario.getVeiculos().add(veiculo);
@@ -214,7 +240,7 @@ public class MenuCliente {
         if (cliente.isPresent()) {
             Usuario usuario = cliente.get();
             System.out.println("Automóveis do cliente: ");
-            usuario.getVeiculos().forEach(v -> System.out.println("Modelo: " + v.getModelo() + ", Placa: " + v.getPlaca()));
+            usuario.getVeiculos().forEach(v -> System.out.println("Marca: " + v.getMarca() + ", Modelo: " + v.getModelo() + ", Cor: " + v.getCor() + ", Placa: " + v.getPlaca()));
         } else {
             System.out.println("Cliente não encontrado.");
         }
@@ -237,8 +263,21 @@ public class MenuCliente {
 
             if (veiculo.isPresent()) {
                 Veiculo v = veiculo.get();
+                System.out.print("Digite o novo tipo (HATCH, SEDA, SUV, PICKUP, SW): ");
+                try {
+                    v.setTipo(TipoVeiculo.valueOf(scanner.nextLine().toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Tipo de veículo inválido. Edição cancelada.");
+                    return;
+                }
+                System.out.print("Digite a nova marca: ");
+                v.setMarca(scanner.nextLine());
                 System.out.print("Digite o novo modelo: ");
                 v.setModelo(scanner.nextLine());
+                System.out.print("Digite a nova cor: ");
+                v.setCor(scanner.nextLine());
+                System.out.print("Digite a nova placa: ");
+                v.setPlaca(scanner.nextLine());
                 repositorioUsuario.save(usuario);
                 System.out.println("Automóvel atualizado com sucesso!");
             } else {
@@ -320,6 +359,7 @@ public class MenuCliente {
                             }
                             System.out.print("Número: ");
                             novoDocumento.setNumero(scanner.nextLine());
+                            novoDocumento.setDataEmissao(new java.util.Date()); // Define a data de emissão atual
                             usuario.getDocumentos().add(novoDocumento);
                         } else if (escolha.equalsIgnoreCase("E")) {
                             System.out.print("Tipo do documento a editar: ");
@@ -362,6 +402,8 @@ public class MenuCliente {
                         escolha = scanner.nextLine();
                         if (escolha.equalsIgnoreCase("A")) {
                             Telefone novoTelefone = new Telefone();
+                            System.out.print("DDD: ");
+                            novoTelefone.setDdd(scanner.nextLine());
                             System.out.print("Número: ");
                             novoTelefone.setNumero(scanner.nextLine());
                             usuario.getTelefones().add(novoTelefone);
@@ -371,6 +413,8 @@ public class MenuCliente {
                             Optional<Telefone> tel = usuario.getTelefones().stream().filter(t -> t.getNumero().equals(numero)).findFirst();
                             if (tel.isPresent()) {
                                 Telefone telefone = tel.get();
+                                System.out.print("Novo DDD: ");
+                                telefone.setDdd(scanner.nextLine());
                                 System.out.print("Novo número: ");
                                 telefone.setNumero(scanner.nextLine());
                             } else {

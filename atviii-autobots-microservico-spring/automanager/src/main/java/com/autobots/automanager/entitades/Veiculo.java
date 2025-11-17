@@ -28,7 +28,11 @@ public class Veiculo {
 	@Column(nullable = false)
 	private TipoVeiculo tipo;
 	@Column(nullable = false)
+	private String marca;
+	@Column(nullable = false)
 	private String modelo;
+	@Column(nullable = false)
+	private String cor;
 	@Column(nullable = false)
 	private String placa;
 	@ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
