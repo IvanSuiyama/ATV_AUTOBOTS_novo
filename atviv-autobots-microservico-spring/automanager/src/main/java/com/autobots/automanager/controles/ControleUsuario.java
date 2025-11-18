@@ -2,6 +2,7 @@ package com.autobots.automanager.controles;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,24 +41,75 @@ public class ControleUsuario {
 		}
 	}
 
-	// ADMIN pode ver todos os usuários
-	@PreAuthorize("hasRole('ADMIN')")
+	// ADMIN, GERENTE e CLIENTE podem buscar usuários (com restrições)
+	@PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE') or hasRole('CLIENTE')")
 	@GetMapping
-	public ResponseEntity<List<Usuario>> obterUsuarios() {
+	public ResponseEntity<List<Usuario>> obterUsuarios(Authentication auth) {
 		List<Usuario> usuarios = repositorio.findAll();
-		return ResponseEntity.ok(usuarios);
+		
+		// ADMIN pode ver todos os usuários
+		if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+			return ResponseEntity.ok(usuarios);
+		}
+		
+		// GERENTE pode ver usuários com perfil GERENTE, VENDEDOR ou CLIENTE
+		if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GERENTE"))) {
+			List<Usuario> usuariosFiltrados = usuarios.stream()
+					.filter(usuario -> usuario.getPerfis().stream()
+							.anyMatch(perfil -> perfil == Perfil.ROLE_GERENTE || 
+											   perfil == Perfil.ROLE_VENDEDOR || 
+											   perfil == Perfil.ROLE_CLIENTE))
+					.collect(Collectors.toList());
+			return ResponseEntity.ok(usuariosFiltrados);
+		}
+		
+		// CLIENTE pode ver apenas usuários com perfil CLIENTE
+		if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CLIENTE"))) {
+			List<Usuario> usuariosFiltrados = usuarios.stream()
+					.filter(usuario -> usuario.getPerfis().stream()
+							.anyMatch(perfil -> perfil == Perfil.ROLE_CLIENTE))
+					.collect(Collectors.toList());
+			return ResponseEntity.ok(usuariosFiltrados);
+		}
+		
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 	}
 
-	// ADMIN e GERENTE podem buscar usuário específico
-	@PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE')")
+	// ADMIN, GERENTE e CLIENTE podem buscar usuário específico (com restrições)
+	@PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE') or hasRole('CLIENTE')")
 	@GetMapping("/{id}")
-	public ResponseEntity<Usuario> buscarUsuario(@PathVariable Long id) {
+	public ResponseEntity<Usuario> buscarUsuario(@PathVariable Long id, Authentication auth) {
 		Optional<Usuario> usuario = repositorio.findById(id);
-		if (usuario.isPresent()) {
-			return ResponseEntity.ok(usuario.get());
-		} else {
+		if (!usuario.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
+		
+		// ADMIN pode ver qualquer usuário
+		if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+			return ResponseEntity.ok(usuario.get());
+		}
+		
+		// GERENTE pode ver usuários com perfil GERENTE, VENDEDOR ou CLIENTE
+		if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GERENTE"))) {
+			boolean temPerfilPermitido = usuario.get().getPerfis().stream()
+					.anyMatch(perfil -> perfil == Perfil.ROLE_GERENTE || 
+									   perfil == Perfil.ROLE_VENDEDOR || 
+									   perfil == Perfil.ROLE_CLIENTE);
+			if (temPerfilPermitido) {
+				return ResponseEntity.ok(usuario.get());
+			}
+		}
+		
+		// CLIENTE pode ver apenas usuários com perfil CLIENTE
+		if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CLIENTE"))) {
+			boolean ehCliente = usuario.get().getPerfis().stream()
+					.anyMatch(perfil -> perfil == Perfil.ROLE_CLIENTE);
+			if (ehCliente) {
+				return ResponseEntity.ok(usuario.get());
+			}
+		}
+		
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 	}
 
 	// ADMIN pode criar usuários com qualquer perfil
@@ -120,12 +172,24 @@ public class ControleUsuario {
 	}
 
 	// ADMIN pode deletar qualquer usuário
-	@PreAuthorize("hasRole('ADMIN')")
+	// GERENTE pode deletar usuários com perfil GERENTE, VENDEDOR ou CLIENTE
+	@PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE')")
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
-		if (!repositorio.existsById(id)) {
+	public ResponseEntity<Void> deletarUsuario(@PathVariable Long id, Authentication auth) {
+		Optional<Usuario> usuario = repositorio.findById(id);
+		if (!usuario.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
+		
+		// GERENTE não pode deletar usuários com perfil ADMIN
+		if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GERENTE"))) {
+			boolean temPerfilAdmin = usuario.get().getPerfis().stream()
+					.anyMatch(perfil -> perfil == Perfil.ROLE_ADMIN);
+			if (temPerfilAdmin) {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+		}
+		
 		repositorio.deleteById(id);
 		return ResponseEntity.noContent().build();
 	}

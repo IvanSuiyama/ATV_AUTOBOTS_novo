@@ -19,16 +19,16 @@ public class ControleMercadoria {
     @Autowired
     private RepositorioMercadoria repositorioMercadoria;
 
-    // GERENTE e VENDEDOR podem ler mercadorias
-    @PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE') or hasRole('VENDEDOR')")
+    // ADMIN, GERENTE, VENDEDOR e CLIENTE podem ler mercadorias
+    @PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE') or hasRole('VENDEDOR') or hasRole('CLIENTE')")
     @GetMapping
     public ResponseEntity<List<Mercadoria>> listarMercadorias() {
         List<Mercadoria> mercadorias = repositorioMercadoria.findAll();
         return ResponseEntity.ok(mercadorias);
     }
 
-    // GERENTE e VENDEDOR podem buscar uma mercadoria específica
-    @PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE') or hasRole('VENDEDOR')")
+    // ADMIN, GERENTE, VENDEDOR e CLIENTE podem buscar uma mercadoria específica
+    @PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE') or hasRole('VENDEDOR') or hasRole('CLIENTE')")
     @GetMapping("/{id}")
     public ResponseEntity<Mercadoria> buscarMercadoria(@PathVariable Long id) {
         Optional<Mercadoria> mercadoria = repositorioMercadoria.findById(id);
@@ -39,28 +39,37 @@ public class ControleMercadoria {
         }
     }
 
-    // VENDEDOR pode criar mercadorias
-    @PreAuthorize("hasRole('ADMIN') or hasRole('VENDEDOR')")
+    // ADMIN, GERENTE e VENDEDOR podem criar mercadorias
+    @PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE') or hasRole('VENDEDOR')")
     @PostMapping
     public ResponseEntity<Mercadoria> criarMercadoria(@RequestBody Mercadoria mercadoria) {
+        // Definir data de cadastro automaticamente
+        mercadoria.setCadastro(new java.util.Date());
         Mercadoria salva = repositorioMercadoria.save(mercadoria);
         return ResponseEntity.status(HttpStatus.CREATED).body(salva);
     }
 
-    // VENDEDOR pode atualizar mercadorias
-    @PreAuthorize("hasRole('ADMIN') or hasRole('VENDEDOR')")
+    // ADMIN, GERENTE e VENDEDOR podem atualizar mercadorias
+    @PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE') or hasRole('VENDEDOR')")
     @PutMapping("/{id}")
     public ResponseEntity<Mercadoria> atualizarMercadoria(@PathVariable Long id, @RequestBody Mercadoria mercadoria) {
         if (!repositorioMercadoria.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
         mercadoria.setId(id);
+        // Preservar data de cadastro original se não informada
+        if (mercadoria.getCadastro() == null) {
+            java.util.Optional<Mercadoria> existente = repositorioMercadoria.findById(id);
+            if (existente.isPresent()) {
+                mercadoria.setCadastro(existente.get().getCadastro());
+            }
+        }
         Mercadoria atualizada = repositorioMercadoria.save(mercadoria);
         return ResponseEntity.ok(atualizada);
     }
 
-    // VENDEDOR pode deletar mercadorias
-    @PreAuthorize("hasRole('ADMIN') or hasRole('VENDEDOR')")
+    // ADMIN, GERENTE e VENDEDOR podem deletar mercadorias
+    @PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE') or hasRole('VENDEDOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarMercadoria(@PathVariable Long id) {
         if (!repositorioMercadoria.existsById(id)) {
