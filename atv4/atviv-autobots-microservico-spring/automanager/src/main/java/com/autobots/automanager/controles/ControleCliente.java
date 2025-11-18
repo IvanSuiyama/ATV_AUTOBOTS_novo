@@ -18,7 +18,7 @@ public class ControleCliente {
 	@Autowired
 	private RepositorioCliente repositorio;
 
-	// GERENTE pode criar clientes
+	// ADMIN e GERENTE podem criar clientes
 	@PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE')")
 	@PostMapping
 	public ResponseEntity<Cliente> cadastrarCliente(@RequestBody Cliente cliente) {
@@ -46,7 +46,7 @@ public class ControleCliente {
 		}
 	}
 	
-	// GERENTE pode atualizar clientes
+	// ADMIN e GERENTE podem atualizar clientes
 	@PreAuthorize("hasRole('ADMIN') or hasRole('GERENTE')")
 	@PutMapping("/{id}")
 	public ResponseEntity<Cliente> atualizarCliente(@PathVariable Long id, @RequestBody Cliente cliente) {

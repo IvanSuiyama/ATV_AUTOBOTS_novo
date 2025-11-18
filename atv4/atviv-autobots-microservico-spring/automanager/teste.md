@@ -1,12 +1,27 @@
-# 🧪 Guia de Testes - Sistema JWT Automanager
+# 🧪 Roteiro de Testes - Sistema JWT Automanager
 
-Este documento contém todos os comandos curl para testar o sistema de autenticação JWT e CRUD com diferentes níveis de permissão.
+Este roteiro testa o sistema completo de autenticação JWT com controle de acesso baseado em roles:
 
-## 🔐 1. AUTENTICAÇÃO
+**Roles e Permissões:**
+- **ADMIN**: Acesso total ao sistema
+- **GERENTE**: Gerencia usuários (exceto ADMIN), clientes, serviços, mercadorias e vendas
+- **VENDEDOR**: CRUD completo em serviços, mercadorias e vendas
+- **CLIENTE**: Visualiza usuários e clientes do mesmo perfil
 
-### Login Admin (usuário padrão)
+**Fluxo de Teste:**
+1. **Login ADMIN** → Criar funcionário VENDEDOR e cliente
+2. **Login VENDEDOR** → Testar operações de vendedor
+3. **Login CLIENTE** → Testar operações de cliente
+4. **Login ADMIN** → Demonstrar funções administrativas avançadas
+
+**BASE_URL:** http://localhost:8080
+
+---
+
+## PASSO 1: Login como ADMINISTRADOR
+
 ```bash
-curl -X POST http://localhost:8080/login \
+curl -X POST "http://localhost:8080/login" \
   -H "Content-Type: application/json" \
   -d '{
     "nomeUsuario": "admin",
@@ -15,386 +30,301 @@ curl -X POST http://localhost:8080/login \
   -v
 ```
 
-### Login usuário personalizado
+**Capture o token:** Copie o token do header `Authorization: Bearer [TOKEN]`
 ```bash
-curl -X POST http://localhost:8080/login \
+TOKEN="[TOKEN_CAPTURADO]"
+```
+
+---
+
+## PASSO 2: Criar FUNCIONÁRIO VENDEDOR (como ADMIN)
+
+```bash
+curl -X POST "http://localhost:8080/usuarios" \
+  -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{
-    "nomeUsuario": "carlos",
+    "nome": "Carlos Vendedor",
+    "nomeSocial": "Carlos",
+    "perfis": ["ROLE_VENDEDOR"],
+    "credencial": {
+      "nomeUsuario": "carlos.vendedor",
+      "senha": "senha123"
+    }
+  }'
+```
+
+**Resultado:** Usuário VENDEDOR criado com ID 3
+
+---
+
+## PASSO 3: Criar USUÁRIO CLIENTE (como ADMIN)
+
+```bash
+curl -X POST "http://localhost:8080/usuarios" \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "João Cliente",
+    "nomeSocial": "João",
+    "perfis": ["ROLE_CLIENTE"],
+    "credencial": {
+      "nomeUsuario": "joao.cliente",
+      "senha": "senha123"
+    }
+  }'
+```
+
+**Resultado:** Usuário CLIENTE criado com ID 4
+
+---
+
+## PASSO 4: Login como VENDEDOR
+
+```bash
+curl -X POST "http://localhost:8080/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nomeUsuario": "carlos.vendedor",
+    "senha": "senha123"
+  }' -v
+```
+
+**Capture o token do VENDEDOR:**
+```bash
+TOKEN_VENDEDOR="[TOKEN_CAPTURADO]"
+```
+
+### Ações do VENDEDOR:
+
+**Criar serviço (deve funcionar):**
+```bash
+curl -X POST "http://localhost:8080/servicos" \
+  -H "Authorization: Bearer ${TOKEN_VENDEDOR}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Consultoria Técnica",
+    "descricao": "Serviço de consultoria especializada",
+    "valor": 150.00
+  }'
+```
+
+**Listar serviços:**
+```bash
+curl -X GET "http://localhost:8080/servicos" \
+  -H "Authorization: Bearer ${TOKEN_VENDEDOR}"
+```
+
+**Listar mercadorias:**
+```bash
+curl -X GET "http://localhost:8080/mercadorias" \
+  -H "Authorization: Bearer ${TOKEN_VENDEDOR}"
+```
+
+**Listar vendas:**
+```bash
+curl -X GET "http://localhost:8080/vendas" \
+  -H "Authorization: Bearer ${TOKEN_VENDEDOR}"
+```
+
+### 4.4 Vendedor visualiza recursos
+
+**Usar TOKEN_VENDEDOR**
+
+```bash
+# Listar serviços
+curl -X GET "http://localhost:8080/servicos" \
+  -H "Authorization: Bearer TOKEN_VENDEDOR"
+
+# Listar mercadorias
+curl -X GET "http://localhost:8080/mercadorias" \
+  -H "Authorization: Bearer TOKEN_VENDEDOR"
+
+# Listar vendas
+curl -X GET "http://localhost:8080/vendas" \
+  -H "Authorization: Bearer TOKEN_VENDEDOR"
+```
+
+---
+
+## PASSO 5: Login como CLIENTE
+
+```bash
+curl -X POST "http://localhost:8080/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nomeUsuario": "joao.cliente",
+    "senha": "senha123"
+  }' -v
+```
+
+**Capture o token do cliente:**
+```bash
+TOKEN_CLIENTE="[TOKEN_CAPTURADO]"
+```
+
+### Ações do CLIENTE:
+
+**Listar usuários (só mostra CLIENTEs):**
+```bash
+curl -X GET "http://localhost:8080/usuarios" \
+  -H "Authorization: Bearer ${TOKEN_CLIENTE}"
+```
+
+**Listar serviços (permitido para visualização):**
+```bash
+curl -X GET "http://localhost:8080/servicos" \
+  -H "Authorization: Bearer ${TOKEN_CLIENTE}"
+```
+
+**Tentar criar serviço (deve falhar com 403):**
+```bash
+curl -X POST "http://localhost:8080/servicos" \
+  -H "Authorization: Bearer ${TOKEN_CLIENTE}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Teste Cliente",
+    "valor": 100.00
+  }' -v
+```
+
+---
+
+## PASSO 6: Login ADMIN novamente - Demais Funções
+
+Use o token admin anterior ou faça novo login:
+```bash
+# Se o token expirou, faça novo login:
+curl -X POST "http://localhost:8080/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nomeUsuario": "admin",
     "senha": "123456"
-  }' \
-  -v
+  }' -i
+
+TOKEN="[NOVO_TOKEN]"
 ```
 
-**📝 Copie o token do header `Authorization: Bearer [TOKEN]` e substitua `[TOKEN_AQUI]` nos comandos abaixo!**
+### Funções Administrativas Avançadas:
 
----
-
-## 👥 2. USUÁRIOS
-
-### Cadastrar Usuário (PÚBLICO - sem token)
+**Listar todos os usuários (só ADMIN):**
 ```bash
-# Admin
-curl -X POST http://localhost:8080/usuarios/cadastrar \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "Carlos Admin",
-    "credencial": {
-      "nomeUsuario": "carlos",
-      "senha": "123456"
-    },
-    "perfis": ["ROLE_ADMIN"]
-  }'
+curl -X GET "http://localhost:8080/usuarios" \
+  -H "Authorization: Bearer ${TOKEN}"
+```
 
-# Gerente
-curl -X POST http://localhost:8080/usuarios/cadastrar \
+**Criar mercadorias:**
+```bash
+curl -X POST "http://localhost:8080/mercadorias" \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${TOKEN}" \
   -d '{
-    "nome": "Maria Gerente",
-    "credencial": {
-      "nomeUsuario": "maria",
-      "senha": "123456"
-    },
-    "perfis": ["ROLE_GERENTE"]
-  }'
-
-# Vendedor
-curl -X POST http://localhost:8080/usuarios/cadastrar \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "João Vendedor",
-    "credencial": {
-      "nomeUsuario": "joao",
-      "senha": "123456"
-    },
-    "perfis": ["ROLE_VENDEDOR"]
-  }'
-
-# Cliente
-curl -X POST http://localhost:8080/usuarios/cadastrar \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "Pedro Cliente",
-    "credencial": {
-      "nomeUsuario": "pedro",
-      "senha": "123456"
-    },
-    "perfis": ["ROLE_CLIENTE"]
+    "nome": "Pneu Aro 15",
+    "descricao": "Pneu para carros populares aro 15",
+    "valor": 250.00,
+    "quantidade": 20,
+    "fabricacao": "2024-01-01T00:00:00.000+00:00",
+    "validade": "2025-12-31T23:59:59.000+00:00"
   }'
 ```
 
-### Listar Usuários (ADMIN apenas)
+**Criar serviços:**
 ```bash
-curl -X GET http://localhost:8080/usuarios \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
-```
-
----
-
-## 🏢 3. CLIENTES
-
-### Criar Cliente (ADMIN, GERENTE, VENDEDOR)
-```bash
-curl -X POST http://localhost:8080/clientes \
+curl -X POST "http://localhost:8080/servicos" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer [TOKEN_AQUI]" \
-  -d '{
-    "nome": "Maria Santos"
-  }'
-
-curl -X POST http://localhost:8080/clientes \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer [TOKEN_AQUI]" \
-  -d '{
-    "nome": "José Silva"
-  }'
-```
-
-### Listar Clientes (ADMIN, GERENTE, VENDEDOR)
-```bash
-curl -X GET http://localhost:8080/clientes \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
-```
-
-### Buscar Cliente por ID (ADMIN, GERENTE, VENDEDOR)
-```bash
-curl -X GET http://localhost:8080/clientes/1 \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
-```
-
-### Atualizar Cliente (ADMIN, GERENTE)
-```bash
-curl -X PUT http://localhost:8080/clientes/1 \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer [TOKEN_AQUI]" \
-  -d '{
-    "nome": "Maria Santos Silva"
-  }'
-```
-
-### Deletar Cliente (ADMIN apenas)
-```bash
-curl -X DELETE http://localhost:8080/clientes/1 \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
-```
-
----
-
-## 🔧 4. SERVIÇOS
-
-### Criar Serviço (ADMIN, GERENTE)
-```bash
-curl -X POST http://localhost:8080/servicos \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer [TOKEN_AQUI]" \
-  -d '{
-    "nome": "Troca de Óleo",
-    "descricao": "Serviço completo de troca de óleo do motor",
-    "valor": 50.0
-  }'
-
-curl -X POST http://localhost:8080/servicos \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer [TOKEN_AQUI]" \
+  -H "Authorization: Bearer ${TOKEN}" \
   -d '{
     "nome": "Alinhamento",
-    "descricao": "Alinhamento e balanceamento das rodas",
-    "valor": 80.0
+    "descricao": "Serviço de alinhamento de rodas",
+    "valor": 80.00
   }'
 ```
 
-### Listar Serviços (todos os roles)
+**Atualizar cliente (só ADMIN/GERENTE):**
 ```bash
-curl -X GET http://localhost:8080/servicos \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
-```
-
-### Buscar Serviço por ID (todos os roles)
-```bash
-curl -X GET http://localhost:8080/servicos/1 \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
-```
-
-### Atualizar Serviço (ADMIN, GERENTE)
-```bash
-curl -X PUT http://localhost:8080/servicos/1 \
+curl -X PUT "http://localhost:8080/clientes/1" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer [TOKEN_AQUI]" \
+  -H "Authorization: Bearer ${TOKEN}" \
   -d '{
-    "nome": "Troca de Óleo Premium",
-    "descricao": "Serviço completo de troca de óleo sintético",
-    "valor": 75.0
+    "nome": "Maria Santos Atualizada"
   }'
 ```
 
-### Deletar Serviço (ADMIN apenas)
+**Deletar recursos (só ADMIN):**
 ```bash
-curl -X DELETE http://localhost:8080/servicos/1 \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
+curl -X DELETE "http://localhost:8080/clientes/2" \
+  -H "Authorization: Bearer ${TOKEN}"
+
+curl -X DELETE "http://localhost:8080/servicos/1" \
+  -H "Authorization: Bearer ${TOKEN}"
+
+curl -X DELETE "http://localhost:8080/mercadorias/1" \
+  -H "Authorization: Bearer ${TOKEN}"
+
+curl -X DELETE "http://localhost:8080/vendas/1" \
+  -H "Authorization: Bearer ${TOKEN}"
 ```
 
 ---
 
-## 📦 5. MERCADORIAS
+## TESTES DE SEGURANÇA
 
-### Criar Mercadoria (ADMIN, GERENTE)
+**Acesso negado sem token:**
 ```bash
-curl -X POST http://localhost:8080/mercadorias \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer [TOKEN_AQUI]" \
-  -d '{
-    "nome": "Filtro de Óleo",
-    "descricao": "Filtro de óleo original",
-    "valor": 25.0,
-    "quantidade": 50,
-    "fabricacao": "2024-01-01T00:00:00.000+00:00",
-    "validade": "2025-12-31T23:59:59.000+00:00"
-  }'
-
-curl -X POST http://localhost:8080/mercadorias \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer [TOKEN_AQUI]" \
-  -d '{
-    "nome": "Pneu 185/60R15",
-    "descricao": "Pneu radial aro 15",
-    "valor": 280.0,
-    "quantidade": 20,
-    "fabricacao": "2024-06-01T00:00:00.000+00:00",
-    "validade": "2029-06-01T00:00:00.000+00:00"
-  }'
+curl -X GET "http://localhost:8080/usuarios"
+curl -X GET "http://localhost:8080/clientes"
 ```
 
-### Listar Mercadorias (todos os roles)
+**Token inválido:**
 ```bash
-curl -X GET http://localhost:8080/mercadorias \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
-```
-
-### Buscar Mercadoria por ID (todos os roles)
-```bash
-curl -X GET http://localhost:8080/mercadorias/1 \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
-```
-
-### Atualizar Mercadoria (ADMIN, GERENTE)
-```bash
-curl -X PUT http://localhost:8080/mercadorias/1 \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer [TOKEN_AQUI]" \
-  -d '{
-    "nome": "Filtro de Óleo Premium",
-    "descricao": "Filtro de óleo sintético premium",
-    "valor": 35.0,
-    "quantidade": 30,
-    "fabricacao": "2024-01-01T00:00:00.000+00:00",
-    "validade": "2025-12-31T23:59:59.000+00:00"
-  }'
-```
-
-### Deletar Mercadoria (ADMIN apenas)
-```bash
-curl -X DELETE http://localhost:8080/mercadorias/1 \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
-```
-
----
-
-## 💰 6. VENDAS
-
-### Criar Venda (todos os roles)
-```bash
-curl -X POST http://localhost:8080/vendas \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer [TOKEN_AQUI]" \
-  -d '{
-    "identificacao": "VENDA-001",
-    "cliente": {
-      "id": 1
-    },
-    "funcionario": {
-      "id": 1
-    },
-    "servicos": [
-      {
-        "id": 1
-      }
-    ],
-    "mercadorias": [
-      {
-        "id": 1
-      }
-    ]
-  }'
-```
-
-### Listar Vendas (todos os roles)
-```bash
-curl -X GET http://localhost:8080/vendas \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
-```
-
-### Buscar Venda por ID (todos os roles)
-```bash
-curl -X GET http://localhost:8080/vendas/1 \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
-```
-
-### Atualizar Venda (ADMIN, GERENTE)
-```bash
-curl -X PUT http://localhost:8080/vendas/1 \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer [TOKEN_AQUI]" \
-  -d '{
-    "identificacao": "VENDA-001-ATUALIZADA",
-    "cliente": {
-      "id": 1
-    },
-    "funcionario": {
-      "id": 1
-    },
-    "servicos": [
-      {
-        "id": 1
-      }
-    ],
-    "mercadorias": [
-      {
-        "id": 1
-      }
-    ]
-  }'
-```
-
-### Deletar Venda (ADMIN apenas)
-```bash
-curl -X DELETE http://localhost:8080/vendas/1 \
-  -H "Authorization: Bearer [TOKEN_AQUI]"
-```
-
----
-
-## 🚫 7. TESTES DE SEGURANÇA
-
-### Tentar acessar sem token (deve retornar 403)
-```bash
-curl -X GET http://localhost:8080/usuarios
-curl -X GET http://localhost:8080/clientes  
-curl -X GET http://localhost:8080/servicos
-```
-
-### Tentar acessar com token inválido (deve retornar 403)
-```bash
-curl -X GET http://localhost:8080/usuarios \
+curl -X GET "http://localhost:8080/usuarios" \
   -H "Authorization: Bearer token-invalido"
 ```
 
----
-
-## 📊 8. MATRIZ DE PERMISSÕES
-
-| Endpoint | ADMIN | GERENTE | VENDEDOR | CLIENTE |
-|----------|-------|---------|----------|---------|
-| **Usuários** |
-| GET /usuarios | ✅ | ❌ | ❌ | ❌ |
-| POST /usuarios/cadastrar | ✅ (público) | ✅ (público) | ✅ (público) | ✅ (público) |
-| **Clientes** |
-| GET /clientes | ✅ | ✅ | ✅ | ❌ |
-| POST /clientes | ✅ | ✅ | ✅ | ❌ |
-| PUT /clientes/{id} | ✅ | ✅ | ❌ | ❌ |
-| DELETE /clientes/{id} | ✅ | ❌ | ❌ | ❌ |
-| **Serviços** |
-| GET /servicos | ✅ | ✅ | ✅ | ✅ |
-| POST /servicos | ✅ | ✅ | ❌ | ❌ |
-| PUT /servicos/{id} | ✅ | ✅ | ❌ | ❌ |
-| DELETE /servicos/{id} | ✅ | ❌ | ❌ | ❌ |
-| **Mercadorias** |
-| GET /mercadorias | ✅ | ✅ | ✅ | ✅ |
-| POST /mercadorias | ✅ | ✅ | ❌ | ❌ |
-| PUT /mercadorias/{id} | ✅ | ✅ | ❌ | ❌ |
-| DELETE /mercadorias/{id} | ✅ | ❌ | ❌ | ❌ |
-| **Vendas** |
-| GET /vendas | ✅ | ✅ | ✅ | ✅ |
-| POST /vendas | ✅ | ✅ | ✅ | ✅ |
-| PUT /vendas/{id} | ✅ | ✅ | ❌ | ❌ |
-| DELETE /vendas/{id} | ✅ | ❌ | ❌ | ❌ |
+**Acesso negado por falta de permissão:**
+```bash
+# Cliente tentando listar usuários
+curl -X GET "http://localhost:8080/usuarios" \
+  -H "Authorization: Bearer ${TOKEN}"
+```
 
 ---
 
-## 🔧 9. ACESSO AO BANCO H2
+## RESUMO DE PERMISSÕES POR PERFIL
 
-Para visualizar os dados no banco:
-
-1. Acesse: http://localhost:8080/h2-console
-2. **JDBC URL:** `jdbc:h2:mem:testdb`
-3. **Username:** `sa`
-4. **Password:** `password`
+| Ação | ADMIN | GERENTE | VENDEDOR | CLIENTE |
+|------|-------|---------|----------|---------|
+| **USUÁRIOS** |
+| Listar usuários | ✅ | ❌ | ❌ | ❌ |
+| Cadastrar usuário | ✅ (público) | ✅ (público) | ✅ (público) | ✅ (público) |
+| **CLIENTES** |
+| Listar clientes | ✅ | ✅ | ✅ | ❌ |
+| Criar cliente | ✅ | ✅ | ✅ | ❌ |
+| Atualizar cliente | ✅ | ✅ | ❌ | ❌ |
+| Deletar cliente | ✅ | ❌ | ❌ | ❌ |
+| **SERVIÇOS** |
+| Listar serviços | ✅ | ✅ | ✅ | ✅ |
+| Criar serviço | ✅ | ✅ | ✅ | ❌ |
+| Atualizar serviço | ✅ | ✅ | ✅ | ❌ |
+| Deletar serviço | ✅ | ❌ | ✅ | ❌ |
+| **MERCADORIAS** |
+| Listar mercadorias | ✅ | ✅ | ✅ | ❌ |
+| Criar mercadoria | ✅ | ✅ | ✅ | ❌ |
+| Atualizar mercadoria | ✅ | ✅ | ✅ | ❌ |
+| Deletar mercadoria | ✅ | ❌ | ✅ | ❌ |
+| **VENDAS** |
+| Listar vendas | ✅ | ✅ | ✅ | ❌ |
+| Criar venda | ✅ | ✅ | ✅ | ❌ |
+| Atualizar venda | ✅ | ✅ | ✅ | ❌ |
+| Deletar venda | ✅ | ❌ | ✅ | ❌ |
 
 ---
 
-## 📝 NOTAS
+## NOTAS IMPORTANTES
 
-- Todos os tokens JWT têm validade de 10 minutos (600000ms)
-- Rotas públicas: `/`, `/usuarios/cadastrar`, `/login`, `/h2-console/**`
-- O usuário admin padrão é criado automaticamente: `admin/123456`
-- Senhas são criptografadas com BCrypt
-- Aplicação roda na porta 8080
+- Substitua `[TOKEN_CAPTURADO]` pelos tokens reais obtidos nos comandos
+- Tokens JWT têm validade limitada 
+- **IDs confirmados dos testes:** ADMIN (1), VENDEDOR (3), CLIENTE (4), Serviço criado (2)
+- **Usuários funcionais:** admin/123456, carlos.vendedor/senha123, joao.cliente/senha123
+- **Testes confirmados:** VENDEDOR cria serviços ✅, CLIENTE não cria serviços (403) ✅
+- **Sistema de permissões baseado em roles funcionando perfeitamente**

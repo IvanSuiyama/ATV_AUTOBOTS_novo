@@ -58,13 +58,6 @@ mvn spring-boot:run
 ### 4. Verificar se Subiu
 A aplicação estará disponível em: **http://localhost:8080**
 
-## 🗄️ Banco de Dados H2
-
-### Console Web
-- **URL:** http://localhost:8080/h2-console
-- **JDBC URL:** `jdbc:h2:mem:testdb`
-- **Username:** `sa`
-- **Password:** `password`
 
 ## 📡 Endpoints da API
 
@@ -93,60 +86,6 @@ A aplicação estará disponível em: **http://localhost:8080**
 - `PUT /enderecos/{id}` - Atualizar endereço
 - `DELETE /enderecos/{id}` - Deletar endereço
 
-## 🧪 Teste Básico
-
-### Listar Clientes
-```bash
-curl -X GET http://localhost:8080/clientes
-```
-
-### Criar Cliente
-```bash
-curl -X POST http://localhost:8080/clientes \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "João Silva",
-    "dataNascimento": "1990-01-01",
-    "nomeSocial": "João"
-  }'
-```
-
-## 📁 Estrutura do Projeto
-
-```
-src/main/java/com/autobots/automanager/
-├── controles/            # REST Controllers
-├── entidades/           # JPA Entities
-├── repositorios/        # JPA Repositories
-├── modelos/            # Business Logic Classes
-└── dto/                # Data Transfer Objects
-
-src/main/resources/
-└── application.properties # Application configuration
-```
-
-## ⚙️ Entidades Principais
-
-- **Cliente** - Dados pessoais do cliente
-- **Documento** - CPF, RG, CNH, etc.
-- **Telefone** - Contatos telefônicos
-- **Endereco** - Endereços do cliente
-
-## 🐛 Solução de Problemas
-
-### Porta 8080 em Uso
-```bash
-# Verificar processos na porta 8080
-lsof -i :8080
-
-# Matar processo se necessário
-kill -9 <PID>
-```
-
-### Erro de Permissão Maven
-```bash
-chmod +x mvnw
-```
 
 ## 📚 Tecnologias Utilizadas
 
