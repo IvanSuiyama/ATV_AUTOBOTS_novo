@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -31,7 +32,7 @@ public class MenuServico {
     @Autowired
     private RepositorioUsuario repositorioUsuario;
 
-    private final Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
 
     public void exibirMenuServicos() {
         int opcao;

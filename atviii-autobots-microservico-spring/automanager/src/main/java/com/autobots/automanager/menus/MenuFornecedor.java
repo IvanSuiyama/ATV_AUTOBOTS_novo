@@ -6,6 +6,7 @@ import com.autobots.automanager.repositorios.RepositorioUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -15,7 +16,7 @@ public class MenuFornecedor {
     @Autowired
     private RepositorioUsuario repositorioUsuario;
 
-    private final Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
 
     public void exibirMenuFornecedores() {
         int opcao;
