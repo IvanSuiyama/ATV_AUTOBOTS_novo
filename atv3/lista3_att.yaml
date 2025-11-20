@@ -1,0 +1,281 @@
+type: collection.insomnia.rest/5.0
+name: Lista03
+meta:
+  id: wrk_ec060f68372a4ceab4cc75d0a82a864b
+  created: 1727217001739
+  modified: 1763553274257
+  description: ""
+collection:
+  - name: Cliente
+    meta:
+      id: fld_601a30ea56844f46b909043e251f5a49
+      created: 1763552132884
+      modified: 1763552635183
+      sortKey: -1763552132884
+      description: ""
+    children:
+      - url: http://localhost:8080/usuarios/2
+        name: New Request
+        meta:
+          id: req_f1599314e35643d0928bb3da5c4c4fc7
+          created: 1763552457113
+          modified: 1763672062968
+          isPrivate: false
+          description: ""
+          sortKey: -1763552457113
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/usuarios
+        name: New Request
+        meta:
+          id: req_2940f912253b4dc39f38b6ea64b95e89
+          created: 1763552470342
+          modified: 1763552475006
+          isPrivate: false
+          description: ""
+          sortKey: -1763552470342
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/usuarios
+        name: New Request
+        meta:
+          id: req_f8f65f44acf74a59a9e3ed52f1c4f919
+          created: 1763552479942
+          modified: 1763552587450
+          isPrivate: false
+          description: ""
+          sortKey: -1763552479942
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+              "nome":"Ivan Suiyama","nomeSocial":"Ivan Silva","perfis":["CLIENTE"],"telefones":[{"ddd":"11","numero":"999999999"}],"emails":[{"endereco":"ivan@gmail.com"}],"endereco":{"estado":"SP","cidade":"São Paulo","bairro":"Centro","rua":"Rua A","numero":"123","codigoPostal":"01001000"}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/usuarios/{id}
+        name: New Request
+        meta:
+          id: req_d0728fab077843f5aaeefd59a2154188
+          created: 1763552535480
+          modified: 1763552577325
+          isPrivate: false
+          description: ""
+          sortKey: -1763552535480
+        method: PUT
+        body:
+          mimeType: application/json
+          text: >-
+            {
+              "nome":"Ivan atualizado","nomeSocial":"Ivan Silva","perfis":["CLIENTE"],"telefones":[{"ddd":"11","numero":"999999999"}],"emails":[{"endereco":"ivan@gmail.com"}],"endereco":{"estado":"SP","cidade":"São Paulo","bairro":"Centro","rua":"Rua A","numero":"123","codigoPostal":"01001000"}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/usuarios/2
+        name: New Request
+        meta:
+          id: req_00b84f04ec7047b087277b3442b2f259
+          created: 1763552611109
+          modified: 1763672069052
+          isPrivate: false
+          description: ""
+          sortKey: -1763552611109
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Veiculo
+    meta:
+      id: fld_ae1ffbfa539c42a19e589bf62c199aee
+      created: 1763552174873
+      modified: 1763552178174
+      sortKey: -1750850859689
+      description: ""
+    children:
+      - url: http://localhost:8080/veiculos
+        name: New Request
+        meta:
+          id: req_62db50fb671b40d598d270224434ffff
+          created: 1763552646758
+          modified: 1763552658361
+          isPrivate: false
+          description: ""
+          sortKey: -1763552646758
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/veiculos
+        name: New Request
+        meta:
+          id: req_71fac62131ba47e88770dfd0f363b46f
+          created: 1763552665870
+          modified: 1763671930682
+          isPrivate: false
+          description: ""
+          sortKey: -1763552665870
+        method: POST
+        body:
+          mimeType: application/json
+          text: '{"tipo":"HATCH","marca":"Fiat","modelo":"Uno","cor":"Branco","placa":"BUU1413","proprietario":{"id":2}}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Venda
+    meta:
+      id: fld_44e8cdf8fcbb4d5c928551910ad18ac5
+      created: 1763552307687
+      modified: 1763552450349
+      sortKey: -1750850859339
+      description: ""
+    children:
+      - url: http://localhost:8080/vendas
+        name: New Request
+        meta:
+          id: req_9d22627a526d4cccbd845a07a74b3ba6
+          created: 1763552345232
+          modified: 1763552434212
+          isPrivate: false
+          description: ""
+          sortKey: -1763552345232
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/vendas
+        name: New Request
+        meta:
+          id: req_71768e5069b342b9a053ce74a498a2f8
+          created: 1763552350266
+          modified: 1763672033145
+          isPrivate: false
+          description: ""
+          sortKey: -1763552350266
+        method: POST
+        body:
+          mimeType: application/json
+          text: '{"cadastro":"2025-11-19T23:00:00Z","identificacao":"AUTOMOVEL-BUU1413-1","valor":1900.00,"cliente":{"id":2},"funcionario":{"id":2},"mercadorias":[],"servicos":[],"veiculo":{"id":1}}'
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/vendas/1
+        name: New Request
+        meta:
+          id: req_0529c5956ea04520a040d6eb2556cae1
+          created: 1763672181620
+          modified: 1763672208555
+          isPrivate: false
+          description: ""
+          sortKey: -1763672181620
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_279baa8dace3c815a3af028a9cce2e6a3b06ee47
+    created: 1750825679032
+    modified: 1750825679032
+environments:
+  name: Base Environment
+  meta:
+    id: env_279baa8dace3c815a3af028a9cce2e6a3b06ee47
+    created: 1727217001743
+    modified: 1750825678901
+    isPrivate: false

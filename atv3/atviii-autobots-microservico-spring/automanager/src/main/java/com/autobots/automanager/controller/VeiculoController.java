@@ -77,6 +77,13 @@ public class VeiculoController {
         if (!repositorioVeiculo.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
+        
+        // Verificar se o veículo tem vendas associadas
+        Optional<Veiculo> veiculo = repositorioVeiculo.findById(id);
+        if (veiculo.isPresent() && !veiculo.get().getVendas().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 Conflict
+        }
+        
         repositorioVeiculo.deleteById(id);
         return ResponseEntity.noContent().build();
     }

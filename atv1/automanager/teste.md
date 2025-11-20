@@ -56,7 +56,7 @@ curl -i -X POST http://localhost:8080/documento/cadastro \
   -d '{
     "tipo": "CPF",
     "numero": "12345678901",
-    "cliente": { "id": 2 }
+    "cliente": { "id": 3 }
   }'
 
 # Atualizar documento (PUT)

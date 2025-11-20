@@ -41,7 +41,7 @@ TOKEN="[TOKEN_CAPTURADO]"
 
 ```bash
 curl -X POST "http://localhost:8080/usuarios" \
-  -H "Authorization: Bearer ${TOKEN}" \
+  -H "Authorization: Bearer ${token}" \
   -H "Content-Type: application/json" \
   -d '{
     "nome": "Carlos Vendedor",
