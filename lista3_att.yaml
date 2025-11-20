@@ -14,12 +14,12 @@ collection:
       sortKey: -1763552132884
       description: ""
     children:
-      - url: http://localhost:8080/usuarios/{id}
+      - url: http://localhost:8080/usuarios/2
         name: New Request
         meta:
           id: req_f1599314e35643d0928bb3da5c4c4fc7
           created: 1763552457113
-          modified: 1763552467007
+          modified: 1763672062968
           isPrivate: false
           description: ""
           sortKey: -1763552457113
@@ -114,12 +114,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:8080/usuarios/{id}
+      - url: http://localhost:8080/usuarios/2
         name: New Request
         meta:
           id: req_00b84f04ec7047b087277b3442b2f259
           created: 1763552611109
-          modified: 1763552626473
+          modified: 1763672069052
           isPrivate: false
           description: ""
           sortKey: -1763552611109
@@ -169,14 +169,14 @@ collection:
         meta:
           id: req_71fac62131ba47e88770dfd0f363b46f
           created: 1763552665870
-          modified: 1763552683414
+          modified: 1763671930682
           isPrivate: false
           description: ""
           sortKey: -1763552665870
         method: POST
         body:
           mimeType: application/json
-          text: '{"tipo":"HATCH","marca":"Fiat","modelo":"Uno","cor":"Branco","placa":"BUU1413","proprietario":{"id":1}}'
+          text: '{"tipo":"HATCH","marca":"Fiat","modelo":"Uno","cor":"Branco","placa":"BUU1413","proprietario":{"id":2}}'
         headers:
           - name: Content-Type
             value: application/json
@@ -224,17 +224,38 @@ collection:
         meta:
           id: req_71768e5069b342b9a053ce74a498a2f8
           created: 1763552350266
-          modified: 1763552411093
+          modified: 1763672033145
           isPrivate: false
           description: ""
           sortKey: -1763552350266
         method: POST
         body:
           mimeType: application/json
-          text: '{"cadastro":"2025-11-19T23:00:00Z","identificacao":"AUTOMOVEL-BUU1413-1","valor":1900.00,"cliente":{"id":1},"funcionario":{"id":2},"mercadorias":[],"servicos":[],"veiculo":{"id":1}}'
+          text: '{"cadastro":"2025-11-19T23:00:00Z","identificacao":"AUTOMOVEL-BUU1413-1","valor":1900.00,"cliente":{"id":2},"funcionario":{"id":2},"mercadorias":[],"servicos":[],"veiculo":{"id":1}}'
         headers:
           - name: Content-Type
             value: application/json
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:8080/vendas/1
+        name: New Request
+        meta:
+          id: req_0529c5956ea04520a040d6eb2556cae1
+          created: 1763672181620
+          modified: 1763672208555
+          isPrivate: false
+          description: ""
+          sortKey: -1763672181620
+        method: DELETE
+        headers:
           - name: User-Agent
             value: insomnia/12.0.0
         settings:

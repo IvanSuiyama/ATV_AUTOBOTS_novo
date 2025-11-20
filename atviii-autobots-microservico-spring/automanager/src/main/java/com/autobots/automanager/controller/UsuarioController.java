@@ -386,6 +386,17 @@ public class UsuarioController {
         if (!repositorioUsuario.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
+        
+        // Verificar se o usuário tem vendas associadas como cliente ou funcionário
+        boolean temVendasComoCliente = repositorioVenda.findAll().stream()
+            .anyMatch(venda -> venda.getCliente() != null && venda.getCliente().getId().equals(id));
+        boolean temVendasComoFuncionario = repositorioVenda.findAll().stream()
+            .anyMatch(venda -> venda.getFuncionario() != null && venda.getFuncionario().getId().equals(id));
+            
+        if (temVendasComoCliente || temVendasComoFuncionario) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 Conflict
+        }
+        
         repositorioUsuario.deleteById(id);
         return ResponseEntity.noContent().build();
     }

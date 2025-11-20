@@ -4,6 +4,11 @@ Base URL (local):
 
 - http://localhost:8080
 
+**Observações importantes:**
+- Para criar/atualizar entidades com campos de data use ISO-8601: `"2025-11-19T23:00:00Z"`
+- Para valores decimais use ponto: `1900.00`
+- Para referenciar entidades existentes use apenas `id`: `"cliente": {"id": 1}`
+- **DELETE**: Se tentar deletar registro com dependências, retorna **409 Conflict**. Delete primeiro as dependências.
 
 ## Rotas Rápidas (Copy / Paste)
 
